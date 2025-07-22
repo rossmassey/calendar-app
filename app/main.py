@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from app.routers import clients, services, centers, employees, slots, bookings
-from app.config import settings
 
 app = FastAPI(
     title="MedSpa Booking API",
@@ -8,7 +7,6 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Include routers (like Django URL includes)
 app.include_router(clients.router, prefix="/api/v1/clients", tags=["clients"])
 app.include_router(services.router, prefix="/api/v1/services", tags=["services"])
 app.include_router(centers.router, prefix="/api/v1/centers", tags=["centers"])

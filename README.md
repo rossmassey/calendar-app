@@ -1,20 +1,19 @@
 # MedSpa Booking API
 
-A FastAPI-based booking system for MedSpa appointments with provider abstraction layer.
+A simple FastAPI-based booking system for MedSpa appointments with provider abstraction.
 
 ## Structure
 
 ```
-medspa_booking_api/
+calendar_app/
 ├── app/
-│   ├── main.py                 # FastAPI app instance
+│   ├── main.py                 # FastAPI app
 │   ├── config.py               # Settings
-│   ├── dependencies.py         # Dependency injection
+│   ├── dependencies.py         # DI
 │   ├── models/                 # Pydantic models
-│   ├── schemas/                # Request/Response schemas
-│   ├── routers/                # Route handlers
-│   ├── providers/              # Provider abstraction layer
-│   ├── services/               # Business logic
+│   ├── schemas/                # Response schemas
+│   ├── routers/                # API routes
+│   ├── providers/              # Provider implementations
 │   └── utils/                  # Utilities
 ├── requirements.txt
 └── README.md
@@ -32,14 +31,13 @@ pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-## API Documentation
-
-Visit `http://localhost:8000/docs` for interactive API documentation.
+Visit `http://localhost:8000/docs` for API documentation.
 
 ## Provider Pattern
 
-The system uses a provider pattern to abstract different calendar backends:
-- `test_provider.py`: Hardcoded test responses
-- Future: `gcal_provider.py`, `zenoti_provider.py`, etc.
+Simple interface for AI assistants that maps to different calendar backends:
+- `test_provider.py`: In-memory test implementation
+- `zenoti_provider.py`: Stub for Zenoti integration
+- Future: Google Calendar, Boulevard, etc.
 
-Configure provider via `PROVIDER` environment variable (defaults to "test"). 
+Configure via `PROVIDER` environment variable (defaults to "test"). 

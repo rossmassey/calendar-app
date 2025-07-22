@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from app.models.booking import BookingCreate
 from app.schemas.booking import BookingResponse, BookingDetailResponse
-from app.providers.test_provider import TestProvider
+from app.providers.base import BaseProvider
 from app.dependencies import get_provider
 
 router = APIRouter()
@@ -10,7 +10,7 @@ router = APIRouter()
 @router.post("/", response_model=BookingResponse)
 async def create_booking(
     booking: BookingCreate,
-    provider: TestProvider = Depends(get_provider)
+    provider: BaseProvider = Depends(get_provider)
 ):
     """Create a booking"""
     result = await provider.create_booking(booking)
@@ -25,7 +25,7 @@ async def create_booking(
 @router.get("/{booking_id}", response_model=BookingDetailResponse)
 async def get_booking(
     booking_id: str,
-    provider: TestProvider = Depends(get_provider)
+    provider: BaseProvider = Depends(get_provider)
 ):
     """Get a booking"""
     booking = await provider.get_booking(booking_id)

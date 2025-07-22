@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Optional, Dict, Any
-from datetime import datetime, date, time
+from datetime import datetime, time
 from decimal import Decimal
 from app.providers.base import BaseProvider
 from app.models.client import ClientCreate, Client
@@ -11,10 +11,9 @@ from app.models.booking import BookingCreate, BookingResponse, BookingDetail
 
 
 class TestProvider(BaseProvider):
-    """Test provider that accepts simple AI interface and maps internally"""
+    """Test provider with hardcoded responses"""
     
     def __init__(self):
-        # Internal storage uses provider's complex structure
         self.clients: Dict[str, Dict[str, Any]] = {}
         self.employees: Dict[str, Dict[str, Any]] = {
             "1": {
@@ -50,24 +49,16 @@ class TestProvider(BaseProvider):
         }
     
     async def create_client(self, client: ClientCreate) -> Client:
-        """Accept simple AI interface, map internally to test provider structure"""
         client_id = str(uuid.uuid4())
-        
-        # Internally we might store more complex data, but AI only provides simple data
         internal_client = {
             "id": client_id,
             "name": client.name,
             "phone": client.phone,
             "email": client.email,
-            "created_at": datetime.utcnow().isoformat(),
-            # Test provider might track additional internal fields
-            "membership_level": "Standard",
-            "visit_count": 0
+            "created_at": datetime.utcnow().isoformat()
         }
-        
         self.clients[client_id] = internal_client
         
-        # Return simple response for AI
         return Client(
             id=client_id,
             name=client.name,
@@ -76,21 +67,17 @@ class TestProvider(BaseProvider):
         )
     
     async def get_client(self, client_id: str) -> Optional[Client]:
-        """Return simple client data for AI - hide internal complexity"""
-        internal_client = self.clients.get(client_id)
-        if not internal_client:
+        client = self.clients.get(client_id)
+        if not client:
             return None
-            
-        # Reduce complex internal data to simple AI interface
         return Client(
-            id=internal_client["id"],
-            name=internal_client["name"],
-            phone=internal_client["phone"],
-            email=internal_client["email"]
+            id=client["id"],
+            name=client["name"],
+            phone=client["phone"],
+            email=client["email"]
         )
     
     async def get_all_clients(self) -> List[Client]:
-        """Return simple client list for AI"""
         return [
             Client(
                 id=client["id"],
@@ -108,25 +95,17 @@ class TestProvider(BaseProvider):
         return False
     
     async def create_employee(self, employee: EmployeeCreate) -> Employee:
-        """Accept simple AI interface, map internally to test provider structure"""
         employee_id = str(uuid.uuid4())
-        
-        # Internally store in test provider's format
         internal_employee = {
             "id": employee_id,
             "name": employee.name,
             "center_id": employee.center_id,
             "phone": employee.phone,
             "specialties": employee.specialties,
-            "is_available": True,
-            # Test provider internal fields
-            "hire_date": datetime.utcnow().isoformat(),
-            "status": "active"
+            "is_available": True
         }
-        
         self.employees[employee_id] = internal_employee
         
-        # Return simple response for AI
         return Employee(
             id=employee_id,
             name=employee.name,
@@ -137,23 +116,19 @@ class TestProvider(BaseProvider):
         )
     
     async def get_employee(self, employee_id: str) -> Optional[Employee]:
-        """Return simple employee data for AI - hide internal complexity"""
-        internal_employee = self.employees.get(employee_id)
-        if not internal_employee:
+        employee = self.employees.get(employee_id)
+        if not employee:
             return None
-            
-        # Reduce complex internal data to simple AI interface
         return Employee(
-            id=internal_employee["id"],
-            name=internal_employee["name"],
-            center_id=internal_employee["center_id"],
-            specialties=internal_employee["specialties"],
-            phone=internal_employee["phone"],
-            is_available=internal_employee["is_available"]
+            id=employee["id"],
+            name=employee["name"],
+            center_id=employee["center_id"],
+            specialties=employee["specialties"],
+            phone=employee["phone"],
+            is_available=employee["is_available"]
         )
     
     async def get_all_employees(self) -> List[Employee]:
-        """Return simple employee list for AI"""
         return [
             Employee(
                 id=emp["id"],
@@ -176,7 +151,6 @@ class TestProvider(BaseProvider):
         return [Service(**service) for service in self.services.values()]
     
     async def get_available_slots(self, customer_id: str, service_id: str, date: str, employee_id: Optional[str] = None) -> List[Slot]:
-        """Return simple slots for AI"""
         return [
             Slot(
                 id="1",
