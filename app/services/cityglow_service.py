@@ -1,6 +1,6 @@
 import json
-import os
-from typing import Dict, List, Optional, Any
+import requests
+from typing import Dict, Optional, Any
 from pathlib import Path
 
 class CityGlowService:
@@ -10,22 +10,53 @@ class CityGlowService:
         self.startup_data: Optional[Dict[str, Any]] = None
         self._load_services_data()
     
+    def _get_headers(self) -> Dict[str, str]:
+        """Get the standard headers for mangomint API requests"""
+        return {
+            "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:141.0) Gecko/20100101 Firefox/141.0",
+            "Accept": "application/json",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Accept-Encoding": "gzip, deflate, br, zstd",
+            "Content-Type": "application/json",
+            "Origin": "https://booking.mangomint.com",
+            "DNT": "1",
+            "Connection": "keep-alive",
+            "Sec-Fetch-Dest": "empty",
+            "Sec-Fetch-Mode": "no-cors",
+            "Sec-Fetch-Site": "cross-site",
+            "TE": "trailers",
+            "X-Mt-App-Version": "876d23a75fb9e556fe558bd419236c5439906e06",
+            "X-Mt-Booking-CompanyId": "722905",
+            "Pragma": "no-cache",
+            "Cache-Control": "no-cache",
+            "Referer": "https://booking.mangomint.com/722905",
+            "Priority": "u=4"
+        }
+    
+    def _fetch_fresh_data(self) -> Dict[str, Any]:
+        """Fetch fresh data from mangomint API"""
+        response = requests.post(
+            "https://booking.mangomint.com/api/v1/booking/app/startup",
+            headers=self._get_headers(),
+            json={},
+            timeout=30.0
+        )
+        response.raise_for_status()
+        return response.json()
+    
     def _load_services_data(self):
-        """Load services data from JSON file"""
+        """Load services data by fetching from API"""
         try:
-            # Look for services.json in the project root
-            json_path = Path(__file__).parent.parent.parent / "services.json"
-            
-            if not json_path.exists():
-                raise FileNotFoundError(f"services.json not found at {json_path}")
-            
-            with open(json_path, 'r') as f:
-                content = f.read()
-                # The file contains a string representation of a dict, so we need to eval it
-                self.startup_data = eval(content)
-                
+            self.startup_data = self._fetch_fresh_data()
         except Exception as e:
-            raise Exception(f"Failed to load services.json: {e}")
+            raise Exception(f"Failed to load services data: {e}")
+    
+    def reload_data(self):
+        """Reload services data by fetching fresh data from API"""
+        try:
+            self.startup_data = self._fetch_fresh_data()
+        except Exception as e:
+            raise Exception(f"Failed to reload data: {e}")
     
     def get_service_categories(self) -> Dict[str, Any]:
         """Get all available service categories"""

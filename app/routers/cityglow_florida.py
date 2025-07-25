@@ -94,4 +94,29 @@ async def get_all() -> Dict[str, Any]:
     try:
         return cityglow_service.get_all_data()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error loading all data: {str(e)}") 
+        raise HTTPException(status_code=500, detail=f"Error loading all data: {str(e)}")
+
+
+@router.get("/refresh_data", summary="Refresh Services Data")
+async def refresh_data() -> Dict[str, Any]:
+    """Refresh services data by fetching latest from mangomint API"""
+    try:
+        # Use the service's reload method which handles the API call
+        cityglow_service.reload_data()
+        
+        # Get some stats from the reloaded data
+        categories_count = len(cityglow_service.startup_data.get('servicesInfo', {}).get('serviceCategories', []))
+        services_count = len(cityglow_service.startup_data.get('servicesInfo', {}).get('servicesById', {}))
+        
+        return {
+            "success": True,
+            "message": "Services data refreshed successfully",
+            "categories_count": categories_count,
+            "services_count": services_count
+        }
+        
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error refreshing services data: {str(e)}"
+        ) 

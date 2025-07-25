@@ -204,3 +204,5 @@ __marimo__/
 
 # pycharm
 .idea/
+
+services.json
